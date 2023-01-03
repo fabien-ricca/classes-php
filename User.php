@@ -1,5 +1,5 @@
 <?php 
-    session_start(); // On ouvre la session
+    session_start();    // On ouvre la session
 
 
     
@@ -18,6 +18,7 @@
             $this->connect = mysqli_connect('localhost', 'root', '', 'classes');        // On connecte la base de donnée
         }
 
+        // METHODE POUR VERIFIER LA FORME DU MDP
         public function checkPassword($password){
             $password_regex = "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/";
             $check = false;
@@ -29,7 +30,6 @@
             return $check;
             
         }
-
 
         // METHODE POUR INSCRIPTION
         public function register($login, $password, $confPassword, $email, $firstname, $lastname){
