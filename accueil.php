@@ -11,10 +11,16 @@
     if(isset($_POST['deconnexion'])) {
         $user->disConnect();
     }
+
+    if(isset($_POST['delete'])){
+        $user->delete($_SESSION['id']);
+    }
 ?>
 
 
 <form class="form" action="" method="POST">
     <input type="submit" id="mybutton" name="deconnexion" value="Me déconnecter" >
+
+    <input type="submit" id="mybutton" name="delete" value="Supprimer mon compte" >
 </form>
 

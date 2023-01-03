@@ -91,6 +91,14 @@
             }
         }
 
+        // METHODE POUR SUPPRIMER UN COMPTE USER
+        public function delete($id){
+            $this->connect;     
+            $req = "DELETE FROM `utilisateurs` WHERE id = '$id'";       // On initie la requete pour supprimer
+            $request = mysqli_query($this->connect, $req);
+            $this->disConnect();        // On appelle la méthode disconnect pour détruire la session et rediriger vers la page de connsexion
+        }
+
     }
 
     // On lance une nouvelle instance de classe
