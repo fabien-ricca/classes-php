@@ -9,6 +9,7 @@
         private $connect;
         private $id;
         public $login;
+        public $password;
         public $email;
         public $firstname;
         public $lastname;
@@ -20,6 +21,7 @@
             if($this->isConnected()){                               // Si un utilisateur est connecté
                 $this->id = $_SESSION['id'];                        // On attribut les valeurs aux propriétés à partir des sessions
                 $this->login = $_SESSION['login'];
+                $this->password = $_SESSION['password'];
                 $this->email =$_SESSION['email'];
                 $this->firstname =$_SESSION['nom'];
                 $this->lastname =$_SESSION['prenom'];
@@ -108,8 +110,58 @@
         }
 
         // METHODE POUR UPDATE LES INFOS DE L'UTILISATEUR
-        public function update($login, $password, $confPassword, $email, $firstname, $lastname){
+        public function update($login, $email, $oldPassword, $newPassword, $confNewPassword){
+            $this->connect;
 
+            if (password_verify($oldPassword, $this->password)){
+                if ($newPassword == $confNewPassword){
+                    if($this->checkPassword($newPassword)){
+                        $cryptPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+                        $req = $this->connect->query("UPDATE `utilisateurs` SET password='$cryptPassword' WHERE id='$this->id'");
+                        $_SESSION['password'] = $cryptPassword;
+                        header("location: profil.php");
+                    }
+                    else{
+                        echo "!! Les nouveaux mot de passes ne sont pas identiques !!";
+                    }
+                }
+            }
+            else{       // Sinon message d'erreur
+                echo "!! Le mot de passe actuel est incorrect !!";
+            }
+
+            // Si le login est différent
+            if ($login != $this->login){
+                $req = "SELECT login FROM `utilisateurs` WHERE login = '$login'";
+                $request = mysqli_query($this->connect, $req);
+
+                // S'il n'existe pas
+                if(mysqli_num_rows($request) < 1){ 
+                    $req = $this->connect->query("UPDATE `utilisateurs` SET login='$login' WHERE id='$this->id'");
+                    $_SESSION['login'] = $login;
+                    header("location: profil.php");
+                }
+                else{       // Sinon message d'erreur
+                    echo "L'utilisateur {$login} existe déjà.";
+                }
+            }
+
+            // Si l'email est différent
+            if ($email != $this->email){
+                $req = "SELECT email FROM `utilisateurs` WHERE email = '$email'";
+                $request = mysqli_query($this->connect, $req);
+
+                // S'il n'existe pas
+                if(mysqli_num_rows($request) < 1){
+                    $req = $this->connect->query("UPDATE `utilisateurs` SET email='$email' WHERE id='$this->id'");
+                    $_SESSION['email'] = $email;
+                    header("location: profil.php");
+                
+                }
+                else{       // Sinon message d'erreur
+                    echo "L'email {$email} est déjà utilisée.";
+                }
+            }
         }
 
         // METHODE POUR RECUPERER TOUTES LES INFOS DE L'UTILISATEUR CONNECTE
@@ -144,22 +196,22 @@
 
         // METHODE POUR RECUPERER LE LOGIN
         public function getLogin(){
-            return "Le login de l'utilisateur est  : {$this->login}";
+            return $this->login;
         }
 
         // METHODE POUR RECUPERER L'EMAIL
         public function getEmail(){
-            return "L'email de l'utilisateur est  : {$this->email}";
+            return $this->email;
         }
 
         // METHODE POUR RECUPERER LE FIRSTNAME
         public function getFirstname(){
-            return "Le prénom de l'utilisateur est : {$this->firstname}";
+            return $this->firstname;
         }
 
         // METHODE POUR RECUPERER LE LASTNAME
         public function getLastname(){
-            return "Le nom de l'utilisateur est : {$this->lastname}";
+            return $this->lastname;
         }
     }
 
