@@ -2,7 +2,7 @@
     //var_dump($_SESSION);
 
     if ($user->isConnected()){
-        echo "Bonjour {$_SESSION['login']}";
+        echo "Bonjour {$_SESSION['login']} <br><br>";
     }
     else{
         header("location: connexion.php");
@@ -15,7 +15,20 @@
     if(isset($_POST['delete'])){
         $user->delete($_SESSION['id']);
     }
+
+    echo $user->getAllInfos() . '<br>';
+
+    echo $user->getLogin() . '<br>';
+
+    echo $user->getEmail() . '<br>';
+
+    echo $user->getFirstname() . '<br>';
+
+    echo $user->getLastname() . '<br>';
+
 ?>
+
+
 
 
 <form class="form" action="" method="POST">

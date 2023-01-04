@@ -16,6 +16,14 @@
         // CONSTRUCTEUR
         public function __construct(){
             $this->connect = mysqli_connect('localhost', 'root', '', 'classes');        // On connecte la base de donnée
+
+            if($this->isConnected()){                               // Si un utilisateur est connecté
+                $this->id = $_SESSION['id'];                        // On attribut les valeurs aux propriétés à partir des sessions
+                $this->login = $_SESSION['login'];
+                $this->email =$_SESSION['email'];
+                $this->firstname =$_SESSION['nom'];
+                $this->lastname =$_SESSION['prenom'];
+            }
         }
 
         // METHODE POUR VERIFIER LA FORME DU MDP
@@ -32,7 +40,7 @@
         }
 
         // METHODE POUR INSCRIPTION
-        public function register($login, $password, $confPassword, $email, $firstname, $lastname){
+        public function register($login, $password, $email, $firstname, $lastname){
             $this->connect;
             $req = "SELECT login FROM `utilisateurs` WHERE login = '$login'"; // On initie la requête pour chercher le login
             $request = mysqli_query($this->connect, $req);
@@ -61,13 +69,13 @@
             if(mysqli_num_rows($request) == 1){                         // Si le login existe
                 $data = mysqli_fetch_assoc($request);                   // on récupère les données de la bdd en assoc
                 if (password_verify($password, $data['password'])){     // Si les mdp sont ok on créée les Sessions et on redirige
-                    $_SESSION['id'] = $data['id'];
+                    $_SESSION['id'] = $data['id'];                      // On créé des variables de session
                     $_SESSION['login'] = $data['login'];
                     $_SESSION['password'] = $data['password'];
                     $_SESSION['email'] = $data['email'];
                     $_SESSION['nom'] = $data['lastname'];
                     $_SESSION['prenom'] = $data['firstname'];
-                    header("location: accueil.php");
+                    header("location: accueil.php");                    // On redirige vers la page d'accueil
                 }
                 else{       // Sinon message d'erreur
                     return "!! Identifiant ou mot de passe incorrect !!";
@@ -86,7 +94,7 @@
 
         // METHODE POUR VERIFIER SI UN USER EST CONNECTE
         public function isConnected(){
-            if($_SESSION['login']){     // Si une Session de login existe on return true
+            if(isset($_SESSION['login'])){     // Si une Session de login existe on return true
                 return true;
             }
         }
@@ -99,8 +107,61 @@
             $this->disConnect();        // On appelle la méthode disconnect pour détruire la session et rediriger vers la page de connsexion
         }
 
+        // METHODE POUR UPDATE LES INFOS DE L'UTILISATEUR
+        public function update($login, $password, $confPassword, $email, $firstname, $lastname){
+
+        }
+
+        // METHODE POUR RECUPERER TOUTES LES INFOS DE L'UTILISATEUR CONNECTE
+        public function getAllInfos(){
+            /*$req = "SELECT * FROM `utilisateurs` WHERE login = '$login'"; // On initie la requête pour chercher le login
+            $request = mysqli_query($this->connect, $req);
+            $data = mysqli_fetch_assoc($request);*/
+            return <<<HTML
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Login</th>
+                                    <th>E-mail</th>
+                                    <th>Prénom</th>
+                                    <th>Nom</th>
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                                <tr>
+                                    <td>{$this->id}</td>
+                                    <td>{$this->login}</td>
+                                    <td>{$this->email}</td>
+                                    <td>{$this->firstname}</td>
+                                    <td>{$this->lastname}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    HTML;
+        }
+
+        // METHODE POUR RECUPERER LE LOGIN
+        public function getLogin(){
+            return "Le login de l'utilisateur est  : {$this->login}";
+        }
+
+        // METHODE POUR RECUPERER L'EMAIL
+        public function getEmail(){
+            return "L'email de l'utilisateur est  : {$this->email}";
+        }
+
+        // METHODE POUR RECUPERER LE FIRSTNAME
+        public function getFirstname(){
+            return "Le prénom de l'utilisateur est : {$this->firstname}";
+        }
+
+        // METHODE POUR RECUPERER LE LASTNAME
+        public function getLastname(){
+            return "Le nom de l'utilisateur est : {$this->lastname}";
+        }
     }
 
-    // On lance une nouvelle instance de classe
-    $user = new User();
+    $user = new User();         // On lance une nouvelle instance de classe
 ?>
