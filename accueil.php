@@ -36,4 +36,3 @@
 
     <input type="submit" id="mybutton" name="delete" value="Supprimer mon compte" >
 </form>
-
