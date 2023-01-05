@@ -19,7 +19,7 @@
             $this->connect = mysqli_connect('localhost', 'root', '', 'classes');        // On connecte la base de donnée
         }
 
-        // setter
+        // SETTER
         public function setUser($id, $login, $password, $email, $firstname, $lastname){
             $this->id = $id;
             $this->login = $login;
@@ -31,23 +31,23 @@
 
         // METHODE POUR VERIFIER LA FORME DU MDP
         public function checkPassword($password){
-            $password_regex = "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/";
-            $check = false;
+            $password_regex = "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/";       // On créé la regex
+            $check = false;     // On initie le check sur false
 
-                // On vérifie que le mdp remplisse les conditions   
+                // On vérifie que le mdp remplisse les conditions, si oui on passe check sur true   
                 if(preg_match($password_regex, $password)){
                     $check = true;
                 }
-            return $check;
+            return $check;      // On return check (true ou false)
             
         }
 
         // METHODE POUR INSCRIPTION
         public function register($login, $password,  $email, $firstname, $lastname){
-            $this->connect;
+            $this->connect;     // On relie la connexion à la base de donnée
             $req = "SELECT login FROM `utilisateurs` WHERE login = '$login'"; // On initie la requête pour chercher le login
             $request = mysqli_query($this->connect, $req);
-            if (strlen($login) >= 5){
+            if (strlen($login) >= 5){       // Si le login fait 5 caractères ou plus
                 if(mysqli_num_rows($request) < 1){      // Si le login n'existe pas, on crypte le mdp, on créé l'user et on redirige vers connexion.php
                     $cryptPassword = password_hash($password, PASSWORD_BCRYPT);
                     $request = $this->connect->query("INSERT INTO `utilisateurs`(`login`, `password`, `email`, `firstname`, `lastname`)
@@ -66,13 +66,15 @@
 
         // METHODE POUR CONNEXION
         public function connect($login, $password){
+            $this->connect;     // On relie la connexion à la base de donnée
             $req = "SELECT * FROM `utilisateurs` WHERE login = '$login'"; // On initie la requête pour chercher le login
             $request = mysqli_query($this->connect, $req);
 
-            if(mysqli_num_rows($request) == 1){                         // Si le login existe
+            if(mysqli_num_rows($request) == 1){                         // Si le login existe (s'il correspond)
                 $data = mysqli_fetch_assoc($request);                   // on récupère les données de la bdd en assoc
-                if (password_verify($password, $data['password'])){     // Si les mdp sont ok on créée les Sessions et on redirige
+                if (password_verify($password, $data['password'])){     // Si le mdp correspond
 
+                    // On créé un nouvel objet avec les données de l'utilisateur qui vient de se connecter, et on le stocke dans une session
                     $user1 = new User();
                     $user1->setUser($data['id'], $data['login'], $data['password'], $data['email'], $data['firstname'], $data['lastname']);
                     $_SESSION['user1'] = $user1;
@@ -95,14 +97,14 @@
 
         // METHODE POUR VERIFIER SI UN USER EST CONNECTE
         public function isConnected(){
-            if(isset($_SESSION['user1']->login)){     // Si une Session de login existe on return true
+            if(isset($_SESSION['user1']->login)){     // Si un attribut 'login' est stocké dans un objet 'user1' existe on return true (si un user est connecté)
                 return true;
             }
         }
 
         // METHODE POUR SUPPRIMER UN COMPTE USER
         public function delete($id){
-            $this->connect;     
+            $this->connect;     // On relie la connexion à la base de donnée
             $req = "DELETE FROM `utilisateurs` WHERE id = '$id'";       // On initie la requete pour supprimer
             $request = mysqli_query($this->connect, $req);
             $this->disConnect();        // On appelle la méthode disconnect pour détruire la session et rediriger vers la page de connsexion

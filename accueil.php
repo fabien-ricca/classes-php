@@ -13,7 +13,7 @@
     }
 
     if(isset($_POST['delete'])){
-        $user->delete($_SESSION['id']);
+        $user->delete($_SESSION['user1']->id);
     }
 
     echo $user->getAllInfos() . '<br>';
