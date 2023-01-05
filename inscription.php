@@ -1,4 +1,35 @@
-<?php include 'User.php';       // On include pour créer une session et lire le fichier de classe ?>
+<?php include 'User.php';       // On include pour créer une session et lire le fichier de classe 
+    $user = new User();  
+    
+    if ($_POST != NULL){
+        $login = htmlspecialchars($_POST['login']);
+        $lastname =  htmlspecialchars($_POST['nom']);
+        $firstname =  htmlspecialchars($_POST['prenom']);
+        $email =  htmlspecialchars($_POST['email']);
+        $password = htmlspecialchars($_POST['password']);
+        $confPassword = htmlspecialchars($_POST['confPassword']);
+
+        var_dump($_POST);
+
+        if ($password == $confPassword){
+            if ($user->checkPassword($password, $confPassword)){
+                $user->register($login, $password, $email, $firstname, $lastname);
+            }
+            else{
+                echo " !! Le mot de passe doit contenir au moins 8 caractères dont
+                1 lettre majuscule, 1 lettre minuscule, 1 caractère spéciale et 1 chiffre!!";
+            }
+        }
+        else{
+            echo "!! Les mots de passes ne sont pas identiques !!";
+        }
+    
+        //echo $user->checkPassword($password, $confPassword);
+    }
+    else{
+        echo "Tous les champs doivent être remplis !";
+    }
+?>
 
 
 <form action="" Method="POST" class="flex-column">
@@ -21,36 +52,4 @@
     <input type="password" id="confPassword" name="confPassword" value="Bonjour@123" placeholder="Bonjour@123" require>
 
     <input type="submit" id="mybutton" value="S'inscrire" ><br><br>
-
-    <?php 
-        if ($_POST != NULL){
-            $login = htmlspecialchars($_POST['login']);
-            $nom =  htmlspecialchars($_POST['nom']);
-            $prenom =  htmlspecialchars($_POST['prenom']);
-            $email =  htmlspecialchars($_POST['email']);
-            $password = htmlspecialchars($_POST['password']);
-            $confPassword = htmlspecialchars($_POST['confPassword']);
-
-            var_dump($_POST);
-
-            if ($password == $confPassword){
-                if ($user->checkPassword($password, $confPassword)){
-                    $user->register($login, $password, $confPassword, $email, $prenom, $nom);
-                }
-                else{
-                    echo " !! Le mot de passe doit contenir au moins 8 caractères dont
-                    1 lettre majuscule, 1 lettre minuscule, 1 caractère spéciale et 1 chiffre!!";
-                }
-            }
-            else{
-                echo "!! Les mots de passes ne sont pas identiques !!";
-            }
-        
-            //echo $user->checkPassword($password, $confPassword);
-        }
-        else{
-            echo "Tous les champs doivent être remplis !";
-        }
-    ?>  
-            <!-- Le message sera affiché en cas derreur -->
 </form>

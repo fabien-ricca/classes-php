@@ -1,7 +1,5 @@
-<?php include 'User.php';       // On include pour créer une session et lire le fichier de classe ?>
-
-
-<?php 
+<?php include 'User.php';       // On include pour créer une session et lire le fichier de classe 
+    $user = new User();
 
     var_dump($_SESSION);
     $msgError = "";         //Création de la variable qui contiendra le message d'erreur du mdp

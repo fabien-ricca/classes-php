@@ -1,8 +1,8 @@
 <?php include 'User.php';       // On include pour créer une session et lire le fichier de classe
-    //var_dump($_SESSION);
+    $user = new User();
 
     if ($user->isConnected()){
-        echo "Bonjour {$_SESSION['login']} <br><br>";
+        echo "Bonjour {$_SESSION['user1']->login} <br><br>";
     }
     else{
         header("location: connexion.php");
@@ -18,16 +18,15 @@
 
     echo $user->getAllInfos() . '<br>';
 
-    echo $user->getLogin() . '<br>';
+    echo 'Login: ' . $user->getLogin() . '<br>';
 
-    echo $user->getEmail() . '<br>';
+    echo 'Email: ' . $user->getEmail() . '<br>';
 
-    echo $user->getFirstname() . '<br>';
+    echo 'Firstname: ' . $user->getFirstname() . '<br>';
 
-    echo $user->getLastname() . '<br>';
+    echo 'Lastname: ' . $user->getLastname() . '<br>';
 
-    var_dump($user);
-
+    var_dump($_SESSION);
 ?>
 
 

@@ -17,18 +17,17 @@
         // CONSTRUCTEUR
         public function __construct(){
             $this->connect = mysqli_connect('localhost', 'root', '', 'classes');        // On connecte la base de donnée
-
-            if($this->isConnected()){                               // Si un utilisateur est connecté
-                $this->id = $_SESSION['id'];                        // On attribut les valeurs aux propriétés à partir des sessions
-                $this->login = $_SESSION['login'];
-                $this->password = $_SESSION['password'];
-                $this->email =$_SESSION['email'];
-                $this->firstname =$_SESSION['nom'];
-                $this->lastname =$_SESSION['prenom'];
-            }
         }
 
-        
+        // setter
+        public function setUser($id, $login, $password, $email, $firstname, $lastname){
+            $this->id = $id;
+            $this->login = $login;
+            $this->password = $password;
+            $this->email = $email;
+            $this->firstname = $firstname;
+            $this->lastname = $lastname;
+        }
 
         // METHODE POUR VERIFIER LA FORME DU MDP
         public function checkPassword($password){
@@ -44,7 +43,7 @@
         }
 
         // METHODE POUR INSCRIPTION
-        public function register($login, $password, $email, $firstname, $lastname){
+        public function register($login, $password,  $email, $firstname, $lastname){
             $this->connect;
             $req = "SELECT login FROM `utilisateurs` WHERE login = '$login'"; // On initie la requête pour chercher le login
             $request = mysqli_query($this->connect, $req);
@@ -73,12 +72,10 @@
             if(mysqli_num_rows($request) == 1){                         // Si le login existe
                 $data = mysqli_fetch_assoc($request);                   // on récupère les données de la bdd en assoc
                 if (password_verify($password, $data['password'])){     // Si les mdp sont ok on créée les Sessions et on redirige
-                    $_SESSION['id'] = $data['id'];                      // On créé des variables de session
-                    $_SESSION['login'] = $data['login'];
-                    $_SESSION['password'] = $data['password'];
-                    $_SESSION['email'] = $data['email'];
-                    $_SESSION['nom'] = $data['lastname'];
-                    $_SESSION['prenom'] = $data['firstname'];
+
+                    $user1 = new User();
+                    $user1->setUser($data['id'], $data['login'], $data['password'], $data['email'], $data['firstname'], $data['lastname']);
+                    $_SESSION['user1'] = $user1;
                     header("location: accueil.php");                    // On redirige vers la page d'accueil
                 }
                 else{       // Sinon message d'erreur
@@ -98,7 +95,7 @@
 
         // METHODE POUR VERIFIER SI UN USER EST CONNECTE
         public function isConnected(){
-            if(isset($_SESSION['login'])){     // Si une Session de login existe on return true
+            if(isset($_SESSION['user1']->login)){     // Si une Session de login existe on return true
                 return true;
             }
         }
@@ -114,13 +111,14 @@
         // METHODE POUR UPDATE LES INFOS DE L'UTILISATEUR
         public function update($login, $email, $oldPassword, $newPassword, $confNewPassword){
             $this->connect;
+            $id = $_SESSION['user1']->id;
 
-            if (password_verify($oldPassword, $this->password)){
+            if (password_verify($oldPassword, $_SESSION['user1']->password)){
                 if ($newPassword == $confNewPassword){
                     if($this->checkPassword($newPassword)){
                         $cryptPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-                        $req = $this->connect->query("UPDATE `utilisateurs` SET password='$cryptPassword' WHERE id='$this->id'");
-                        $_SESSION['password'] = $cryptPassword;
+                        $req = $this->connect->query("UPDATE `utilisateurs` SET password='$cryptPassword' WHERE id='$id'");
+                        $_SESSION['user1']->password = $cryptPassword;
                         header("location: profil.php");
                     }
                     else{
@@ -139,8 +137,8 @@
 
                 // S'il n'existe pas
                 if(mysqli_num_rows($request) < 1){ 
-                    $req = $this->connect->query("UPDATE `utilisateurs` SET login='$login' WHERE id='$this->id'");
-                    $_SESSION['login'] = $login;
+                    $req = $this->connect->query("UPDATE `utilisateurs` SET login='$login' WHERE id='$id'");
+                    $_SESSION['user1']->login = $login;
                     header("location: profil.php");
                 }
                 else{       // Sinon message d'erreur
@@ -155,8 +153,8 @@
 
                 // S'il n'existe pas
                 if(mysqli_num_rows($request) < 1){
-                    $req = $this->connect->query("UPDATE `utilisateurs` SET email='$email' WHERE id='$this->id'");
-                    $_SESSION['email'] = $email;
+                    $req = $this->connect->query("UPDATE `utilisateurs` SET email='$email' WHERE id='$id'");
+                    $_SESSION['user1']->email = $email;
                     header("location: profil.php");
                 
                 }
@@ -170,7 +168,8 @@
         public function getAllInfos(){
             /*$req = "SELECT * FROM `utilisateurs` WHERE login = '$login'"; // On initie la requête pour chercher le login
             $request = mysqli_query($this->connect, $req);
-            $data = mysqli_fetch_assoc($request);*/
+            $data = mysqli_fetch_assoc($request);
+            return $data;*/
             return <<<HTML
                         <table>
                             <thead>
@@ -185,11 +184,11 @@
                         
                             <tbody>
                                 <tr>
-                                    <td>{$this->id}</td>
-                                    <td>{$this->login}</td>
-                                    <td>{$this->email}</td>
-                                    <td>{$this->firstname}</td>
-                                    <td>{$this->lastname}</td>
+                                    <td>{$_SESSION['user1']->id}</td>
+                                    <td>{$_SESSION['user1']->login}</td>
+                                    <td>{$_SESSION['user1']->email}</td>
+                                    <td>{$_SESSION['user1']->firstname}</td>
+                                    <td>{$_SESSION['user1']->lastname}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -198,22 +197,22 @@
 
         // METHODE POUR RECUPERER LE LOGIN
         public function getLogin(){
-            return $this->login;
+            return $_SESSION['user1']->login;
         }
 
         // METHODE POUR RECUPERER L'EMAIL
         public function getEmail(){
-            return $this->email;
+            return $_SESSION['user1']->email;
         }
 
         // METHODE POUR RECUPERER LE FIRSTNAME
         public function getFirstname(){
-            return $this->firstname;
+            return $_SESSION['user1']->firstname;
         }
 
         // METHODE POUR RECUPERER LE LASTNAME
         public function getLastname(){
-            return $this->lastname;
+            return $_SESSION['user1']->lastname;
         }
     }
 
