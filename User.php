@@ -28,6 +28,8 @@
             }
         }
 
+        
+
         // METHODE POUR VERIFIER LA FORME DU MDP
         public function checkPassword($password){
             $password_regex = "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/";

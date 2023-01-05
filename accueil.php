@@ -26,6 +26,8 @@
 
     echo $user->getLastname() . '<br>';
 
+    var_dump($user);
+
 ?>
 
 
